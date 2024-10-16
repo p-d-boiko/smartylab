@@ -8,6 +8,8 @@ const Calculator: FC = () => {
   const [operation, setOperation] = useState<string>()
 
   const handleNumClick: MouseEventHandler<HTMLInputElement> = useCallback((event) => {
+    // lets convert the input value to number and incease the base by it
+    // do it on the left operand if operation is set, and on the right operand otherwise
     if (operation) {
       setRightOperand(prev => prev ? prev * 10 + Number((event.target as HTMLInputElement).value) : Number((event.target as HTMLInputElement).value))
     } else {
@@ -16,11 +18,12 @@ const Calculator: FC = () => {
   }, [leftOperand, rightOperand, operation])
 
   const handleOperatorClick: MouseEventHandler<HTMLInputElement> = useCallback((event) => {
+    // lets set the operation
     if (!operation) {
       setOperation((event.target as HTMLInputElement).value)
     }
 
-    // if operation is set
+    // if operation is set, let's calculate
     if (rightOperand) {
       setLeftOperand(calculate(leftOperand, rightOperand, operation))
       setRightOperand(undefined)
@@ -29,6 +32,7 @@ const Calculator: FC = () => {
   }, [operation, leftOperand, rightOperand])
 
   const evaluate = () => {
+    // nothing to do if expression is incomplete, early return
     if (!leftOperand || !rightOperand || !operation) return
 
     // lets the result of expression in left operand and reset right operant and operation:
@@ -38,22 +42,26 @@ const Calculator: FC = () => {
   }
 
   const del = useCallback(() => {
+    // let's delete the last digit of right operand
     if (rightOperand) {
       setRightOperand(prev => Number(String(prev).slice(0, -1)))
-
+      
       return
     }
-
+    
+    // let's delete the operation symbol, if no right operand
     if (operation) {
       setOperation(undefined)
-
+      
       return
     }
-
+    
+    // no right operand and no operation defined? let's delete the last digit of left operand
     setLeftOperand(prev => Number(String(prev).slice(0, -1)))
   }, [rightOperand, setRightOperand, operation, setOperation, setLeftOperand])
 
   const clear = () => {
+    // reset to initial state
     setLeftOperand(0)
     setRightOperand(undefined)
     setOperation(undefined)
